@@ -1,0 +1,19 @@
+name: Infrastructure checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for forbidden files
+        shell: bash
+        run: |
+          test -z "$(find . -type f \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.pes' \) -print)"
+          ! grep -RInE '(^|[^A-Za-z])(ghp_|github_pat_|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY)' . --exclude-dir=.git
